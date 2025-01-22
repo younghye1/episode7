@@ -65,8 +65,6 @@ public class List1 : MonoBehaviour
         }
 
     }
-    void RemoveAtData(int i)
-    {
         //i에 해당하는 데이터가 있는지?
         //참: 지워라, 거짓: 패스
         //datas.Contains(값)
@@ -76,20 +74,6 @@ public class List1 : MonoBehaviour
         //datas.Find()
             //참
 
-       try
-       {
-        datas.RemoveAt(i); //순번(index)에 해당하는 것만 삭제        
-       }
-       catch(ArgumentAoutOfRangeExeption)
-       {
-        
-       }
-       finally
-       {
-
-       }
-    }
-    [Button("SortData"),HideField] public bool _b2;
     void SortData()
     {
         //기본 정렬 해보기
