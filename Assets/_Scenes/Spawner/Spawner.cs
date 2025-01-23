@@ -18,6 +18,7 @@ public class Spawner : MonoBehaviour
     [SerializeField, Preview(Size.small)] List <GameObject> prefabs;
     [Space(15), HorizontalLine("배치속성", color: FixedColor.CherryRed), HideField] public bool _l1;
     [SerializeField] LayerMask layermask;
+    [SerializeField] Color gizmoColor = Color.white;
 
 
     [SerializeField] float radius; //지름
@@ -125,7 +126,7 @@ public class Spawner : MonoBehaviour
 
     void OnDrawGizmos() //에디터에서 기즈모를 그릴 수 있는 공간
     {
-        Gizmos.color = Color.magenta;
+        Gizmos.color = gizmoColor;
         Gizmos.DrawWireSphere(transform.position, radius);
         Gizmos.DrawWireCube(transform.position, Vector3.one * radius);
         //Gizmos.DrawIcon(transform.position,"arrow");

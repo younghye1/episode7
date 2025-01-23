@@ -1,4 +1,4 @@
-
+using System.Collections.Generic;
 using UnityEngine;
 using CustomInspector;
 
@@ -7,11 +7,13 @@ public class TilemapGenerator : MonoBehaviour
 
     [Header("하이트맵 소스")]    
     [SerializeField] Texture2D heightmap;
-    [SerializeField] GameObject tilePrefab; // 지형 프리팹
+    [SerializeField] List<GameObject> tilePrefabs; // 지형 프리팹
     
 
-    [Header("하이트맵 속성")]    
-    [SerializeField, Range(1f,200f)] float heightRange;
+    [Header("하이트맵 속성")] 
+    [SerializeField] LayerMask layerGround; // 그라운드 레이어
+    [SerializeField, Range(1f,200f)] float heightRange; // 높이 간격
+    [SerializeField, Range(0f,10f)] float gapRange; // 넓이 간격
 
 
     [Space(10), HorizontalLine("버튼"), HideField] public bool _l1;
@@ -58,7 +60,18 @@ public class TilemapGenerator : MonoBehaviour
 
         float w = heightmap.width;    // Horizontal
         float h = heightmap.height;   // Vertical
-        GameObject Empty = new GameObject("TileGroup");
+        GameObject tileRoot = new GameObject("Tiles_");
+        tileRoot.isStatic = true;
+        
+        // 적용 안됨 (실패)
+        //tileRoot.layer = layerGround; 
+        
+        // 작동은 되나 불편함
+        //tileRoot.layer = LayerMask.NameToLayer(LayerMaskToString(layerGround)); 
+
+        // 
+        tileRoot.layer = GetLayerFromLayerMask(layerGround);
+
 
         for (int x = 0; x < w; x++)
         {
@@ -71,20 +84,54 @@ public class TilemapGenerator : MonoBehaviour
                 // RED 채널만 활용 : 등고선 표현
                 // 컬러의 r채널을 높이값으로 활용 * heightRange 로 값을 증폭 (더 극명하게 보여주기 위해)
                 float y = col.r * heightRange;
+
+                Vector3 pos = new Vector3(x * gapRange, y, z * gapRange);
                                 
-                GameObject contour = Instantiate(tilePrefab, new Vector3(x,y,z), Quaternion.identity);
-                contour.transform.SetParent(Empty.transform);
+                int rndidx = Random.Range(0,tilePrefabs.Count);
+                GameObject contour = Instantiate(tilePrefabs[rndidx], pos, Quaternion.identity);
+                contour.isStatic = true;
+                contour.layer = GetLayerFromLayerMask(layerGround);
+                contour.transform.SetParent(tileRoot.transform);
                 
-
-
-                //col.g
-                // if ( col.g != 0f )
-                // {
-                //     // GREEN 채널만 활용 : 나무를 심는다
-                //     GameObject trees = Instantiate(treePrefab, new Vector3(x,y + treeOffset,z), Quaternion.identity);
-                //     trees.transform.SetParent(Empty.transform);
-                // }
             }
         }
+    }
+
+
+    string LayerMaskToString(LayerMask layerMask)
+    {
+        string layerNames = "";
+        for (int i = 0; i < 32; i++)
+        {
+            if ((layerMask.value & (1 << i)) != 0)
+            {
+                string layerName = LayerMask.LayerToName(i);
+                if (!string.IsNullOrEmpty(layerName))
+                {
+                    if (layerNames == "")
+                        layerNames = layerName;
+                    else
+                        layerNames += ", " + layerName;
+                }
+            }
+        }
+
+        if (string.IsNullOrEmpty(layerNames))
+            layerNames = "Nothing";
+        
+        return layerNames;
+    }
+
+
+    private int GetLayerFromLayerMask(LayerMask layerMask)
+    {
+        for (int i = 0; i < 32; i++)
+        {
+            if ((layerMask.value & (1 << i)) > 0)
+                return i;
+        }
+
+        Debug.LogWarning("LayerMask에 설정된 레이어가 없음");
+        return 0; 
     }
 }
