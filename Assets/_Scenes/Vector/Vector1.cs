@@ -74,7 +74,9 @@ public class Vector1 : MonoBehaviour
 
         Gizmos.color = new Color(1f, 1f, 0f);
         Gizmos.DrawRay(Vector3.zero, AaddB);
+        
         //벡터간 뺄셈 : 가능
+        // 의미 : 둘 사이의 기준벡터 거리(방향)
         AminusB = vA - vB;
         Gizmos.color = new Color(0f, 1f, 0f);
         Gizmos.DrawRay(Vector3.zero, AminusB);
